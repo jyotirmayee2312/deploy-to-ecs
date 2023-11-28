@@ -1,37 +1,39 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      java: corretto17
-    commands:
-      - echo "Updating package lists..."
-      - sudo apt update
-      - echo "Installing Maven..."
-      - sudo apt install maven -y || sudo apt-get install -y maven
+ install:
+   runtime-versions:
+     java: corretto17
+   commands:
+     - echo "Updating package lists..."
+     - sudo apt update
+     - echo "Installing Maven..."
+     - sudo apt install maven -y || sudo apt-get install -y maven
 
-  pre_build:
-    commands:
-      - echo Log in to Amazon ECR...
-      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 373169706564.dkr.ecr.ap-south-1.amazonaws.com/ecr_ecs
-      - REPOSITORY_URI=373169706564.dkr.ecr.ap-south-1.amazonaws.com/ecr_ecs
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
+ pre_build:
+   commands:
+     - echo Log in to Amazon ECR...
+     - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 373169706564.dkr.ecr.ap-south-1.amazonaws.com/ecr_ecs
+     - REPOSITORY_URI=373169706564.dkr.ecr.ap-south-1.amazonaws.com/ecr_ecs
+     - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+     - IMAGE_TAG=${COMMIT_HASH:=latest}
+     - echo Building the application...
+     - mvn clean package
 
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+ build:
+   commands:
+     - echo Build started on `date`
+     - echo Building the Docker image...
+     - docker build -t $REPOSITORY_URI:latest .
+     - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+ post_build:
+   commands:
+     - echo Build completed on `date`
+     - docker push $REPOSITORY_URI:latest
+     - docker push $REPOSITORY_URI:$IMAGE_TAG
+     - echo Writing image definitions file...
+     - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
-  files: imagedefinitions.json
+ files: imagedefinitions.json
