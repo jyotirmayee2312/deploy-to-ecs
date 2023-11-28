@@ -6,7 +6,7 @@ phases:
     java: corretto17
   commands:
     - echo Installing Maven...
-    - sudo apt install maven
+    -  sudo apt install maven -y
  pre_build:
   commands:
     - echo Log in to Amazon ECR...
