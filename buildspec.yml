@@ -36,4 +36,4 @@ phases:
      - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
- files: imagedefinitions.json
+ files: 
