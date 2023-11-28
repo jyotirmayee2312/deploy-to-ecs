@@ -5,16 +5,10 @@ phases:
     runtime-versions:
       java: corretto17
     commands:
-      - echo "Installing Java version 17 ..."
-      - export JAVA_HOME="$JAVA_17_HOME"
-      - export JRE_HOME="$JRE_17_HOME"
-      - export JDK_HOME="$JDK_17_HOME"
-      # Manually download and install Maven
-      - wget -O apache-maven.tar.gz https://downloads.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
-      - tar xzf apache-maven.tar.gz
-      - export PATH=/path/to/apache-maven-3.8.4/bin:$PATH
-      # Verify Maven installation
-      - mvn -version
+      - echo "Updating package lists..."
+      - sudo apt update
+      - echo "Installing Maven..."
+      - sudo apt install maven -y || sudo apt-get install -y maven
 
   pre_build:
     commands:
