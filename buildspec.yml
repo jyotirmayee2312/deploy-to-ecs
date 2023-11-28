@@ -6,7 +6,6 @@ phases:
     java: corretto17
   commands:
     - echo Installing Maven...
-    - sudo apt update
     - sudo apt install maven
  pre_build:
   commands:
