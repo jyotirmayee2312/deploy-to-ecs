@@ -3,7 +3,7 @@ version: 0.2
 phases:
  install:
    runtime-versions:
-     java: corretto11
+     java: corretto17
    commands:
      - echo Installing Maven...
      - curl -s https://apache-mirror.rbc.ru/pub/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | tar xz
