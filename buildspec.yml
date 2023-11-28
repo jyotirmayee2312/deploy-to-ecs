@@ -1,31 +1,43 @@
 version: 0.2
 
 phases:
- install:
-  runtime-versions:
-    java: corretto17
-  commands:
-    - echo Installing Maven...
-    -  sudo apt install maven -y
- pre_build:
-  commands:
-    - echo Log in to Amazon ECR...
-    - $(aws ecr get-login --no-include-email --region us-east-1)
-    - REPOSITORY_URI=373169706564.dkr.ecr.us-east-1.amazonaws.com/aws-ecs-docker
-    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    - IMAGE_TAG=${COMMIT_HASH:=latest}
- build:
-  commands:
-    - echo Build started on `date`
-    - echo Building the Docker image...
-    - docker build -t $REPOSITORY_URI:latest .
-    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
- post_build:
-  commands:
-    - echo Build completed on `date`
-    - docker push $REPOSITORY_URI:latest
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
-    - echo Writing image definitions file...
-    - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo "Installing Java version 17 ..."
+      - export JAVA_HOME="$JAVA_17_HOME"
+      - export JRE_HOME="$JRE_17_HOME"
+      - export JDK_HOME="$JDK_17_HOME"
+      # Manually download and install Maven
+      - wget -O apache-maven.tar.gz https://downloads.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
+      - tar xzf apache-maven.tar.gz
+      - export PATH=/path/to/apache-maven-3.8.4/bin:$PATH
+      # Verify Maven installation
+      - mvn -version
+
+  pre_build:
+    commands:
+      - echo Log in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+      - REPOSITORY_URI=373169706564.dkr.ecr.us-east-1.amazonaws.com/aws-ecs-docker
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"exp-code-pipeline","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
 artifacts:
- files: imagedefinitions.json
+  files: imagedefinitions.json
