@@ -5,7 +5,7 @@ FROM tomcat:latest
 COPY target/hello-world-maven.war /usr/local/tomcat/webapps/
 
 # Expose the default Tomcat port
-EXPOSE 8081
+EXPOSE 8080
 
 # Start Tomcat using catalina.sh run command when the container starts
 CMD ["catalina.sh", "run"]
