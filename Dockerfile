@@ -2,7 +2,7 @@
 FROM tomcat:latest
 
 # Copy the WAR file from the local filesystem into the webapps directory of Tomcat
-COPY target/hello-world-maven.war /usr/local/tomcat/webapps/
+COPY /var/lib/jenkins/workspace/wednesday-pipeline/target/hello-world-maven.war /usr/local/tomcat/webapps/
 
 # Expose the default Tomcat port
 EXPOSE 8081
